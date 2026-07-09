@@ -13,7 +13,7 @@
   "keywords": [],
   "author": "VIKTOR_BONDARENKO <bondarenkoviktor577@gmail.com>",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/ViktorBond7/file-organizer/issues"
   },
