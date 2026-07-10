@@ -1,10 +1,14 @@
 {
   "name": "file-organizer",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "CLI tool for organizing files in a directory based on their extensions",
+  "main": "file-organizer.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "scan": "node file-organizer.js scan",
+    "duplicates": "node file-organizer.js duplicates",
+    "organize": "node file-organizer.js organize",
+    "cleanup": "node file-organizer.js cleanup"
   },
   "repository": {
     "type": "git",
@@ -17,5 +21,8 @@
   "bugs": {
     "url": "https://github.com/ViktorBond7/file-organizer/issues"
   },
-  "homepage": "https://github.com/ViktorBond7/file-organizer#readme"
+  "homepage": "https://github.com/ViktorBond7/file-organizer#readme",
+  "dependencies": {
+    "commander": "^15.0.0"
+  }
 }

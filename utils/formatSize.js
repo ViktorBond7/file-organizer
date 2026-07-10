@@ -1,11 +1,11 @@
 function formatSize(bytes) {
-  if (bytes === 0) return "0 B";
-
-  const units = ["B", "KB", "MB", "GB"];
-  const k = 1024;
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-  return `${(bytes / Math.pow(k, i)).toFixed(2)} ${units[i]}`;
+  if (bytes < 1024 * 1024) {
+    return `${(bytes / 1024).toFixed(1)} KB`;
+  } else if (bytes < 1024 * 1024 * 1024) {
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  } else {
+    return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+  }
 }
 
 export default formatSize;
