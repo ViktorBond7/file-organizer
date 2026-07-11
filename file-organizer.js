@@ -1,63 +1,30 @@
 import { Scanner } from "./lib/scanner.js";
-import formatSize from "./utils/formatSize.js";
-import process from "node:process";
+import {
+  onFileFound,
+  onScanComplete,
+  onScanError,
+} from "./handlers/scanHandlers.js";
 
-const targetPath = process.argv[2];
+import { Command, InvalidArgumentError } from "commander";
 
-const scanner = new Scanner();
+const program = new Command();
 
-scanner.on("file-found", ({ path, size, mtime }) => {
-  console.log(
-    `File found: ${path}, Size: ${formatSize(size)}, Modified: ${mtime}`,
-  );
-});
+program
+  .name("file-organizer")
+  .description("CLI tool to organize files")
+  .version("1.0.0");
 
-scanner.on(
-  "scan-complete",
-  (
-    { totalFiles, totalSize, extensions },
-    byAge,
-    top3LargeFiles,
-    oldestFile,
-  ) => {
-    console.log("\n");
-    console.log("📊 Scan Results:");
-    console.log("━".repeat(60));
-    console.log(
-      `Total files: ${totalFiles}\nTotal Size: ${formatSize(totalSize)}`,
-    );
-    console.log("\n");
-    console.log("━".repeat(60));
-    console.log("Extension Statistics:");
-    console.log("━".repeat(60));
-    extensions.forEach(({ extension, count, size }) => {
-      console.log(
-        `${"  "}${extension}, Count: ${count}, Size: ${formatSize(size)}`,
-      );
-    });
-    console.log("\n");
-    console.log("━".repeat(60));
-    console.log("File Age:");
-    console.log("━".repeat(60));
-    console.log(`${"  "}Files modified in the last 7 days: ${byAge.last7Days}`);
-    console.log(
-      `${"  "}Files modified in the last 30 days: ${byAge.last30Days}`,
-    );
-    console.log(`${"  "}Files older than 90 days: ${byAge.olderThan90Days}`);
-    console.log("\n");
+program
+  .command("scan <directory>")
+  .description("Scan directory and show statistics")
+  .action(async (directory) => {
+    const scanner = new Scanner();
 
-    console.log("━".repeat(60));
-    console.log("Largest files:");
-    console.log("━".repeat(60));
-    top3LargeFiles.forEach(({ name, size }, i) => {
-      console.log(`${"  "}${i + 1}. ${name}, ${formatSize(size)}`);
-    });
-    console.log("\n");
+    scanner.on("file-found", onFileFound);
+    scanner.on("scan-complete", onScanComplete);
+    scanner.on("scan-error", onScanError);
 
-    console.log(
-      `Oldest file: ${oldestFile.name}, Modified: ${oldestFile.modified} days ago`,
-    );
-  },
-);
+    await scanner.scan(directory);
+  });
 
-scanner.scan(targetPath);
+program.parse();
