@@ -1,10 +1,17 @@
 import formatSize from "../utils/formatSize.js";
 import process from "node:process";
+import drawProgressBar from "../utils/drawProgressBar.js";
 
-export const onFileFound = ({ path, size, mtime }) => {
-  console.log(
-    `File found: ${path}, Size: ${formatSize(size)}, Modified: ${mtime}`,
-  );
+export const onFileFound = ({
+  path,
+  size,
+  mtime,
+  totalFiles,
+  currentFileIndex,
+}) => {
+  const progress = drawProgressBar(currentFileIndex, totalFiles);
+
+  console.log(`📂 Scanning: ${path}` + `\nProcessing... ${progress} files`);
 };
 
 export const onScanComplete = (
@@ -13,6 +20,9 @@ export const onScanComplete = (
   top3LargeFiles,
   oldestFile,
 ) => {
+  if (process.stdout.isTTY) {
+    process.stdout.write("\n");
+  }
   console.log("\n");
   console.log("📊 Scan Results:");
   console.log("━".repeat(60));
@@ -48,15 +58,4 @@ export const onScanComplete = (
   console.log(
     `Oldest file: ${oldestFile.name}, Modified: ${oldestFile.modified} days ago`,
   );
-};
-
-export const onScanError = ({ directory, error }) => {
-  if (error.code === "ENOENT") {
-    console.error(`❌ Error: Directory not found: ${directory}`);
-  } else if (error.code === "EACCES") {
-    console.error(`❌ Error: Permission denied: ${directory}`);
-  } else {
-    console.error(`❌ Unexpected error: ${error.message}`);
-  }
-  process.exit(1);
 };

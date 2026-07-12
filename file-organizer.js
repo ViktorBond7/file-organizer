@@ -1,13 +1,13 @@
 import { Scanner } from "./lib/scanner.js";
 import { DuplicateFinder } from "./lib/duplicates.js";
-import {
-  onFileFound,
-  onScanComplete,
-  onScanError,
-} from "./handlers/scanHandlers.js";
+import { Command } from "commander";
+import { onFileFound, onScanComplete } from "./handlers/scanHandlers.js";
 
-import { onDuplicatesFound } from "./handlers/duplicatesHandler.js";
-import { Command, InvalidArgumentError } from "commander";
+import {
+  onDuplicatesFound,
+  onFileFoundInDuplicates,
+} from "./handlers/duplicatesHandler.js";
+import { onError } from "./handlers/errorHandler.js";
 
 const program = new Command();
 
@@ -24,7 +24,7 @@ program
 
     scanner.on("file-found", onFileFound);
     scanner.on("scan-complete", onScanComplete);
-    scanner.on("scan-error", onScanError);
+    scanner.on("scan-error", onError);
 
     await scanner.scan(directory);
   });
@@ -35,11 +35,11 @@ program
   .action(async (directory) => {
     const duplicateFinder = new DuplicateFinder();
 
-    duplicateFinder.on("file-processed", (filePath) => {
-      console.log(`Processed: ${filePath}`);
-    });
+    duplicateFinder.on("file-processed", onFileFoundInDuplicates);
 
     duplicateFinder.on("duplicates-found", onDuplicatesFound);
+
+    duplicateFinder.on("error", onError);
 
     await duplicateFinder.findDuplicates(directory);
   });

@@ -1,5 +1,17 @@
 import formatSize from "../utils/formatSize.js";
 import formatSecretHash from "../utils/formatSecretHash.js";
+import drawProgressBar from "../utils/drawProgressBar.js";
+
+export const onFileFoundInDuplicates = ({
+  fullPath,
+  entriesLength,
+  currentFileIndex,
+}) => {
+  const progress = drawProgressBar(currentFileIndex, entriesLength);
+  console.log(
+    `🔍 Searching for duplicates in: ${fullPath}` + `\nProcessed: ${progress}`,
+  );
+};
 
 export const onDuplicatesFound = ({
   duplicates,
