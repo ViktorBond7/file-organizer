@@ -1,5 +1,6 @@
 import { Scanner } from "./lib/scanner.js";
 import { DuplicateFinder } from "./lib/duplicates.js";
+import { Cleanup } from "./lib/cleanup.js";
 import { Command } from "commander";
 import { onFileFound, onScanComplete } from "./handlers/scanHandlers.js";
 import {
@@ -14,6 +15,7 @@ import {
   onFileFoundInDuplicates,
 } from "./handlers/duplicatesHandler.js";
 import { onError } from "./handlers/errorHandler.js";
+import { onFileFoundInCleanup } from "./handlers/cleanupHandler.js";
 
 const program = new Command();
 
@@ -66,6 +68,29 @@ program
     organizer.on("copy-error", onError);
 
     await organizer.organize(source, target);
+  });
+
+program
+  .command("cleanup <directory>")
+  .description("Cleanup old files in a directory")
+  .requiredOption(
+    "-o, --older-than <days>",
+    "Delete files older than specified days",
+    parseInt,
+  )
+  .option("-c, --confirm", "Confirm deletion without prompt")
+  .action(async (directory, options) => {
+    const { olderThan, confirm } = options;
+    console.log(`🧹 Cleanup: ${directory}`);
+    console.log(`Looking for files older than ${olderThan} days...`);
+
+    const cleanup = new Cleanup();
+
+    cleanup.on("file-found", onFileFoundInCleanup);
+    // cleanup.on("cleanup-complete", onCleanupComplete);
+    // cleanup.on("cleanup-error", onError);
+
+    await cleanup.cleanup(directory, olderThan, confirm);
   });
 
 program.parse();
