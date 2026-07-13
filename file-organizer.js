@@ -2,7 +2,13 @@ import { Scanner } from "./lib/scanner.js";
 import { DuplicateFinder } from "./lib/duplicates.js";
 import { Command } from "commander";
 import { onFileFound, onScanComplete } from "./handlers/scanHandlers.js";
-
+import {
+  onFileFoundInOrganizer,
+  onCreatedDirectory,
+  onFoldersCreateStart,
+  onOrganizeComplete,
+} from "./handlers/organizeHandler.js";
+import { Organizer } from "./lib/organizer.js";
 import {
   onDuplicatesFound,
   onFileFoundInDuplicates,
@@ -42,6 +48,24 @@ program
     duplicateFinder.on("error", onError);
 
     await duplicateFinder.findDuplicates(directory);
+  });
+
+program
+  .command("organize <source>")
+  .description("Organize files in the source directory into categories")
+  .requiredOption("-o, --output <target>", "Target directory")
+  .action(async (source, options) => {
+    const { output: target } = options;
+    const organizer = new Organizer();
+
+    organizer.on("folders-create-start", onFoldersCreateStart);
+    organizer.on("directory-created", onCreatedDirectory);
+    organizer.on("copy-start", onFileFoundInOrganizer);
+    organizer.on("copy-complete", onOrganizeComplete);
+
+    organizer.on("copy-error", onError);
+
+    await organizer.organize(source, target);
   });
 
 program.parse();
