@@ -11,7 +11,7 @@ export const onFileFound = ({
 }) => {
   const progress = drawProgressBar(currentFileIndex, totalFiles);
 
-  console.log(`📂 Scanning: ${path}` + `\nProcessing... ${progress} files`);
+  console.log(`\r📂 Scanning: ${path}` + `\nProcessing... ${progress} files`);
 };
 
 export const onScanComplete = (

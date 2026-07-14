@@ -15,7 +15,11 @@ import {
   onFileFoundInDuplicates,
 } from "./handlers/duplicatesHandler.js";
 import { onError } from "./handlers/errorHandler.js";
-import { onFileFoundInCleanup } from "./handlers/cleanupHandler.js";
+import {
+  onFileFoundInCleanup,
+  onCleanupDelete,
+  onCleanupComplete,
+} from "./handlers/cleanupHandler.js";
 
 const program = new Command();
 
@@ -87,8 +91,9 @@ program
     const cleanup = new Cleanup();
 
     cleanup.on("file-found", onFileFoundInCleanup);
-    // cleanup.on("cleanup-complete", onCleanupComplete);
-    // cleanup.on("cleanup-error", onError);
+    cleanup.on("file-deleted", onCleanupDelete);
+    cleanup.on("cleanup-complete", onCleanupComplete);
+    cleanup.on("cleanup-error", onError);
 
     await cleanup.cleanup(directory, olderThan, confirm);
   });
